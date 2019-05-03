@@ -27,7 +27,7 @@ from scipy.stats.kde import gaussian_kde
 
 import datetime
 
-data12 = pd.read_csv('gridwatchAllCols.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
+data12 = pd.read_csv('gridwatch.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
 data12.loc['2013-05-15']#=='2011-05-27'
 data12['Hour'] = data12.index.hour
 data12['Min'] = data12.index.minute
