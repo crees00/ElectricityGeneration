@@ -42,7 +42,7 @@ def checkRow(row, thresh=7e4):
                 return (data161[' demand'][row['id']-i])
 
 
-data16 = pd.read_csv('gridwatchAllCols.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
+data16 = pd.read_csv('gridwatch.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
 #data10.drop('Belgium-UK',1,level=0,inplace=True)
 data16.head()
 data16.iloc[638919,10] = 1510
@@ -86,11 +86,11 @@ rangeEnd = pts-monthSlot
 def updateToolTips(dataLength=dataLength):
     tooltips = []#('Demand','@{ demand}{( 0,0)}MW')]
     if dataLength == 'month':
-        slot, space = monthSlot, 12
+        slot, space = monthSlot, 1
         tooltips.insert(0,('Time','@{ timestamp}{%H:%M}'))
         tooltips.insert(1,('Date','@{ timestamp}{%a %e-%b}'))
     elif dataLength == 'week':
-        slot,space = weekSlot, 3
+        slot,space = weekSlot, 1
         tooltips.insert(0,('Time','@{ timestamp}{%H:%M}'))
         tooltips.insert(1,('Date','@{ timestamp}{%a %e-%b}'))
     elif dataLength == 'day':

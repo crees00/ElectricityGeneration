@@ -27,7 +27,7 @@ from scipy.stats.kde import gaussian_kde
 
 import datetime
 
-data12 = pd.read_csv('gridwatchNucVsWind.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
+data12 = pd.read_csv('gridwatch.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
 data12.loc['2013-05-15']#=='2011-05-27'
 data12['Hour'] = data12.index.hour
 data12['Min'] = data12.index.minute
@@ -104,14 +104,6 @@ for i, year in enumerate(reversed(years)):
            fill_color=palette1[9-i], line_color=palette1[9-i], alpha=0.5, legend='Nuclear')
     p.quad(top=y2, bottom=((str(year),0),)*len(y2), left=edges[:-1], right=edges[1:],
            fill_color=palette2[9-i], line_color=palette2[9-i], alpha=0.5, legend='Wind')
- #  print('Sum: hist',np.sum(hist),'hist2',np.sum(hist2))
- #   print('Max: hist',np.max(hist)*1000,'hist2',np.max(hist2)*1000)
-    #p.line(x, pdf, line_color="#ff8888", line_width=4, alpha=0.7, legend="PDF")
-    #p.line(x, cdf, line_color="orange", line_width=2, alpha=0.7, legend="CDF")
-
-    #p.y_range.start = 0
-    #p.legend.location = "center_right"
-    #p.legend.background_fill_color = "#fefefe"
 
 
 

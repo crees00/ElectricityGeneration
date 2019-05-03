@@ -12,19 +12,30 @@ import allTheSquiggles
 import tidalvwind
 import twinRidgePlot
 import govtDataPlot
+import paras
 
 from bokeh.io import curdoc
 from bokeh.layouts import column,row
 
 #output_file("C:/Users/Chris/Documents/Documents/Python2018/DataVisCW/Plots/panels"+nowtime()+".html")
 
+tab0 = Panel(child= paras.introP,
+             title = 'Intro')
 
+tab1 = Panel(child=column(paras.squiggleP,
+                          allTheSquiggles.layout),
+             title='Squiggles')
+tab2 = Panel(child=column(paras.ridgeP,
+                          twinRidgePlot.layout), 
+             title='Ridges')
+tab3 = Panel(child = column(paras.govtP,
+                            govtDataPlot.layout), 
+             title = 'Trends')
+tab4 = Panel(child = column(paras.tidalvwindP,
+                            tidalvwind.layout), 
+             title = 'Tidal v wind')
 
-tab1 = Panel(child=allTheSquiggles.layout, title='Squiggles')
-tab2 = Panel(child=twinRidgePlot.layout, title='Ridges')
-tab3 = Panel(child = govtDataPlot.layout, title = 'Trends')
-tab4 = Panel(child = tidalvwind.layout, title = 'Tidal v wind')
-
-tabs = Tabs(tabs=[tab1,tab2,tab3,tab4])
+tabs = Tabs(tabs=[tab0,tab1,tab2,tab3,tab4])
 
 curdoc().add_root(tabs)
+#show(tabs)
