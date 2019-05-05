@@ -45,8 +45,8 @@ def nowtime():
 
 ## TWIN RIDGE PLOT - NOT KDE ##
 #from bokeh.palettes import *
-
-output_file("plots/twinridgeplot"+nowtime()+".html")
+if output_folder != None:
+    output_file(output_folder+"/twinridgeplot"+nowtime()+".html")
 
 def ridge(category, data, scale=800):
     return list(zip([category]*len(data), scale*data))
