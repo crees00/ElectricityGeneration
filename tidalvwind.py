@@ -35,7 +35,6 @@ hrsIn1yr = 365*24
 annualOutputQuoted = 572e9 # GWh
 avgPowerQuoted = annualOutputQuoted/hrsIn1yr
 avgPowerExpected = 36e6 # W
-no7MWturbinesNeeded = offshoreWindCapNeeded/7e6 # The three UK offshore wind projects in construction have 7MW turbines - renewableuk.com
 genHrsPerDay = 12
 powerWhenGenerating = avgPowerExpected*24/genHrsPerDay
 powerWhenGenerating/1e6
@@ -184,7 +183,7 @@ def updateBarCDS(start,end):
     that the bar chart updates.
     Called within both callback functions'''
     y=[]
-    for bar in nameList:
+    for bar in ylist:
         y.append(calcEnergy(makeDateSubset(condf, startDate=start, endDate=end),bar))
     barDict = dict(x=nameList, top=y,col = colorList)
     barDS.data.update(ColumnDataSource(data=barDict).data)
