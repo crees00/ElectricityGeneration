@@ -25,7 +25,7 @@ import colorcet as cc
 import seaborn as sns
 from numpy import linspace
 from scipy.stats.kde import gaussian_kde
-
+import panels
 
 import datetime
 #%load_ext blackcellmagic
@@ -128,12 +128,16 @@ condf.drop(['SP_x', 'Settlement Date_x', 'SP_y','Settlement Date_y', 'SP', 'Sett
 # Plot demand IN ONE WEEK with Bokeh
 
 ylist=['tidal','dudg','sher','burb']
-#output_file("C:/Users/Chris/Documents/Documents/Python2018/DataVisCW/Plots/tidalLine"+nowtime()+".html")
-fig = figure(plot_width=600, plot_height=400,
+if panels.output_folder != None:
+    output_file(panels.output_folder+nowtime()+".html")
+fig = figure(plot_width=600, plot_height=550,
              title='Power at 30min intervals, MW',
-            x_axis_type='datetime', toolbar_location="above")
-barfig = figure(plot_width=300, plot_height=400,
-             title='Electricity generated in period (GWh)',
+            x_axis_type='datetime', toolbar_location="above",
+            tools='wheel_zoom,pan,reset',
+            active_scroll='wheel_zoom')
+fig.toolbar.logo=None
+barfig = figure(plot_width=300, plot_height=550,
+             title='Electricity generated in period, GWh',
              toolbar_location=None,
                x_range=ylist)
 
@@ -160,7 +164,8 @@ for colRef,bar in enumerate(ylist,1):
     y.append(calcEnergy(condf,bar))
     colorList.append(Category10[(len(ylist)+2)][colRef])
     
-barDict = dict(x=ylist, top=y, col = colorList)
+barDict = dict(x=ylist, top=y, col = colorList,
+               names=['Tidal','Dudgeon','Sheringham\n Shoal','Burbo Bank\n Extension'])
 
 barDS = ColumnDataSource((barDict))
 
@@ -172,7 +177,8 @@ for colRef,line in enumerate(ylist,1):
 
 bars = VBar(x='x', top='top',width=0.5,
             line_color='col',
-           fill_color='col')
+           fill_color='col',
+           name='names')
 barfig.add_glyph(barDS, bars)
 
 fig.outline_line_color = None

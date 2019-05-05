@@ -23,7 +23,8 @@ import colorcet as cc
 import seaborn as sns
 from numpy import linspace
 from scipy.stats.kde import gaussian_kde
-
+import panels
+import getData
 
 import datetime
 #%load_ext blackcellmagic
@@ -33,45 +34,20 @@ def nowtime():
     now=datetime.datetime.now()
     return "".join([str(i) for i in (now.day,0,now.month,now.year,now.hour,now.minute)])
 
-def checkRow(row, thresh=7e4):
-    if row[' demand'] < thresh:
-        return row[' demand']
-    else:
-        for i in range(5,12):
-            if (data161[' demand'][row['id']-i])<thresh:
-                return (data161[' demand'][row['id']-i])
-
-
-data16 = pd.read_csv('gridwatch.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
-#data10.drop('Belgium-UK',1,level=0,inplace=True)
-data16.head()
-data16.iloc[638919,10] = 1510
-data16.iloc[638920,10] = 1510
-data16[data16['id']==638925].loc[:,' solar'] = 1510
-data16['Hour'] = data16.index.hour
-data16['Min'] = data16.index.minute
-data16['DayHour'] = data16['Hour'] + data16['Min']/60
-data16['Year'] = data16.index.year
-data16['Month'] = data16.index.month
-data16['Day'] = data16.index.day
-data16[data16['DayHour']==1.5].head()
-data16[' solar'].max()
-
-data161 = data16.reset_index()
-
-data161[' demand'] = data161.apply(lambda row: checkRow(row,1e5),axis=1)
-
-
+data161 = getData.data161.copy()
 
 
 # Plot demand IN ONE DAY/WEEK/MONTH with Bokeh
 
 dataLength = 'week'
-
-output_file("C:/Users/Chris/Documents/Documents/Python2018/DataVisCW/Plots/AllTheSquiggles"+nowtime()+".html")
+if panels.output_folder != None:
+    output_file(panels.output_folder+"/AllTheSquiggles"+nowtime()+".html")
 fig = figure(plot_width=800, plot_height=500,
              title='UK electricity sources and demand, recorded at 5min intervals',
-            x_axis_type='datetime', toolbar_location="above")
+            x_axis_type='datetime', toolbar_location="above",
+            tools='wheel_zoom,pan,box_zoom,reset',
+            active_scroll='wheel_zoom')
+fig.toolbar.logo=None
 pts = len(data161)
 
 

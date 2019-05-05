@@ -14,7 +14,7 @@ import re
 from bokeh.io import output_file, show, output_notebook, curdoc, push_notebook
 from bokeh.plotting import figure, output_file, show, output_notebook
 from bokeh.models import HoverTool, ColumnDataSource, Select,FixedTicker, PrintfTickFormatter, \
-Legend, DatetimeTickFormatter, CrosshairTool
+Legend, DatetimeTickFormatter, CrosshairTool, LabelSet, Label,NumeralTickFormatter
 from bokeh.models.widgets import Select, Tabs, Panel, Slider, TextInput, DateRangeSlider, RangeSlider
 from bokeh.models.glyphs import VBar
 from bokeh.layouts import column, row
@@ -24,7 +24,7 @@ import seaborn as sns
 from numpy import linspace
 from scipy.stats.kde import gaussian_kde
 
-
+import panels
 import datetime
 
 data12 = pd.read_csv('gridwatch.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
@@ -45,8 +45,8 @@ def nowtime():
 
 ## TWIN RIDGE PLOT - NOT KDE ##
 #from bokeh.palettes import *
-
-output_file("plots/twinridgeplot"+nowtime()+".html")
+if panels.output_folder != None:
+    output_file=(panels.output_folder+"/twinridgeplot"+nowtime()+".html")
 
 def ridge(category, data, scale=800):
     return list(zip([category]*len(data), scale*data))
@@ -66,8 +66,10 @@ source2 = ColumnDataSource(data=dict(xnew=xnew))
 
 p = figure(plot_width=900,y_range=[str(year) for year in reversed(years)], 
             x_range=(-5, xmax),#,toolbar_location=None)
-           title = 'Histogram showing power output for each 5min interval throughout the year')
-
+           title = 'Histogram showing power output for each 5min interval throughout the year',
+           tools='pan,box_zoom,wheel_zoom,reset',
+           active_scroll='wheel_zoom')
+p.toolbar.logo=None
 p.xaxis.axis_label = 'Power output (MW)'
 
     #p.yaxis.axis_label = 'Pr(x)'
@@ -87,6 +89,12 @@ p.xgrid.ticker = p.xaxis[0].ticker
 p.axis.minor_tick_line_color = None
 p.axis.major_tick_line_color = None
 p.axis.axis_line_color = None
+p.xaxis.formatter=NumeralTickFormatter(format="0,000")
+p.xaxis.axis_label_text_font_style = "bold"
+p.yaxis.axis_label_text_font_style = "bold"
+p.xaxis.major_label_text_font_size = '12pt'
+p.yaxis.major_label_text_font_size = '10pt'  # turn off y-axis tick labels
+
 
 p.y_range.range_padding = 0.1
 
@@ -106,6 +114,11 @@ for i, year in enumerate(reversed(years)):
            fill_color=palette2[9-i], line_color=palette2[9-i], alpha=0.5, legend='Wind')
 
 
-
+#label=Label(x=9500, y=6.5, x_units='data', 
+#            text='Maximum nuclear generation\n9.4GW', 
+#            render_mode='css')
+      #border_line_color='black', border_line_alpha=1.0,
+      #background_fill_color='white', background_fill_alpha=0.3)
+#p.add_layout(label)
 layout = p
 #show(p)
