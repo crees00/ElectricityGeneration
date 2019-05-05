@@ -17,26 +17,27 @@ import paras
 
 from bokeh.io import curdoc
 from bokeh.layouts import column,row
-global output_folder
 output_folder="C:/Users/Chris/Documents/Documents/Python2018/DataVisCW/Plots"
 #output_file("C:/Users/Chris/Documents/Documents/Python2018/DataVisCW/Plots/panels"+nowtime()+".html")
 
 tab0 = Panel(child= paras.introP,
-             title = 'Intro')
+             title = 'Info')
 
 tab1 = Panel(child=column(paras.squiggleP,
                           allTheSquiggles.layout),
-             title='High res data')
+             title='Explore the data')
 tab2 = Panel(child=column(paras.ridgeP,
                           twinRidgePlot.layout), 
-             title='Ridges')
+             title='Nuclear vs Wind')
 tab3 = Panel(child = column(paras.govtP,
                             govtDataPlot.layout,
-                            paras.govtPb), 
+                            row(paras.govtPb,
+                                paras.gap,
+                                paras.govtPc)), 
              title = 'Trends')
 tab4 = Panel(child = column(paras.tidalvwindP,
                             tidalvwind.layout), 
-             title = 'Tidal v wind')
+             title = 'Tidal vs wind')
 
 tab5 = Panel(child = loadFollowingHex.layout, 
              title = 'Load Following')

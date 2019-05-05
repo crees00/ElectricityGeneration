@@ -16,7 +16,6 @@ from bokeh.models.widgets import Div
 from bokeh.util.hex import hexbin
 from bokeh.transform import linear_cmap
 import paras
-import panels
 ###########################################################################
 # Creates hex plot
 #######################################################################
@@ -37,8 +36,8 @@ def nowtime():
 df = pd.read_csv('LF5052019107.csv')
 df.drop('Unnamed: 0',inplace=True, axis=1)
 
-if panels.output_folder != None:
-    output_file(panels.output_folder+"loadFollowingHex"+nowtime()+".html")
+#if panels.output_folder != None:
+#    output_file(panels.output_folder+"loadFollowingHex"+nowtime()+".html")
 
 #dataSource = ColumnDataSource(df)
 

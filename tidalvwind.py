@@ -25,7 +25,6 @@ import colorcet as cc
 import seaborn as sns
 from numpy import linspace
 from scipy.stats.kde import gaussian_kde
-import panels
 
 import datetime
 #%load_ext blackcellmagic
@@ -126,20 +125,21 @@ condf.drop(['SP_x', 'Settlement Date_x', 'SP_y','Settlement Date_y', 'SP', 'Sett
 ########### PLOT ###############################################
 
 # Plot demand IN ONE WEEK with Bokeh
+nameList= ['Tidal','Dudgeon',"Sher'm Shoal",'BBE']   
 
 ylist=['tidal','dudg','sher','burb']
-if panels.output_folder != None:
-    output_file(panels.output_folder+nowtime()+".html")
+#if panels.output_folder != None:
+#    output_file(panels.output_folder+nowtime()+".html")
 fig = figure(plot_width=600, plot_height=550,
              title='Power at 30min intervals, MW',
             x_axis_type='datetime', toolbar_location="above",
-            tools='wheel_zoom,pan,reset',
-            active_scroll='wheel_zoom')
+            tools='wheel_zoom,box_zoom,pan,reset',
+            active_drag='box_zoom')
 fig.toolbar.logo=None
 barfig = figure(plot_width=300, plot_height=550,
              title='Electricity generated in period, GWh',
              toolbar_location=None,
-               x_range=ylist)
+               x_range=nameList)
 
 # Initial values
 timeRange=10
@@ -163,9 +163,8 @@ y,colorList= [],[]
 for colRef,bar in enumerate(ylist,1):
     y.append(calcEnergy(condf,bar))
     colorList.append(Category10[(len(ylist)+2)][colRef])
-    
-barDict = dict(x=ylist, top=y, col = colorList,
-               names=['Tidal','Dudgeon','Sheringham\n Shoal','Burbo Bank\n Extension'])
+barDict = dict(x=nameList, top=y, col = colorList,
+               names=nameList)
 
 barDS = ColumnDataSource((barDict))
 
@@ -191,15 +190,17 @@ fig.xaxis.minor_tick_line_color = 'black'
 fig.axis.axis_line_color = 'black'
 fig.y_range.start=0
 barfig.y_range.start=0
+#nameDict =  {i:nameList[i] for i in list(range(4))}
+#barfig.xaxis.major_label_overrides = nameDict
 #fig.yaxis.axis_label = 'Total electricity supplied in Quarter (TWh)'
 
 numDays = (endDate-startDate).days
 
 def updateBarCDS(start,end):
     y=[]
-    for bar in ylist:
+    for bar in nameList:
         y.append(calcEnergy(makeDateSubset(condf, startDate=start, endDate=end),bar))
-    barDict = dict(x=ylist, top=y,col = colorList)
+    barDict = dict(x=nameList, top=y,col = colorList)
     barDS.data.update(ColumnDataSource(data=barDict).data)
 
 

@@ -24,7 +24,6 @@ import seaborn as sns
 from numpy import linspace
 from scipy.stats.kde import gaussian_kde
 
-import panels
 import datetime
 
 data12 = pd.read_csv('gridwatch.csv', index_col=1,skip_blank_lines=True, header=[0], parse_dates=True)
@@ -45,8 +44,8 @@ def nowtime():
 
 ## TWIN RIDGE PLOT - NOT KDE ##
 #from bokeh.palettes import *
-if panels.output_folder != None:
-    output_file=(panels.output_folder+"/twinridgeplot"+nowtime()+".html")
+#if panels.output_folder != None:
+#    output_file=(panels.output_folder+"/twinridgeplot"+nowtime()+".html")
 
 def ridge(category, data, scale=800):
     return list(zip([category]*len(data), scale*data))
@@ -67,8 +66,8 @@ source2 = ColumnDataSource(data=dict(xnew=xnew))
 p = figure(plot_width=900,y_range=[str(year) for year in reversed(years)], 
             x_range=(-5, xmax),#,toolbar_location=None)
            title = 'Histogram showing power output for each 5min interval throughout the year',
-           tools='pan,box_zoom,wheel_zoom,reset',
-           active_scroll='wheel_zoom')
+           tools='pan,box_zoom,box_zoom,wheel_zoom,reset',
+           active_drag='box_zoom')
 p.toolbar.logo=None
 p.xaxis.axis_label = 'Power output (MW)'
 

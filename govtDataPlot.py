@@ -19,7 +19,6 @@ import colorcet as cc
 import seaborn as sns
 from numpy import linspace
 from scipy.stats.kde import gaussian_kde
-import panels
 
 import datetime
 
@@ -92,13 +91,13 @@ def nowtime():
 
 # Now have energy sources plus demand - time to plot them ###########################################
 
-if panels.output_folder != None:
-    output_file(panels.output_folder+"/SourcesDemandLine"+nowtime()+".html")
+#if panels.output_folder != None:
+#    output_file(panels.output_folder+"/SourcesDemandLine"+nowtime()+".html")
 fig = figure(plot_width=700, plot_height=500,
              title='Total electricity demand/supply each quarter since 1998, TWh',
             x_axis_type='datetime', toolbar_location="above",
             tools='pan,box_zoom,wheel_zoom,reset',
-            active_scroll='wheel_zoom')
+            active_drag='box_zoom')
 fig.toolbar.logo=None
 dataSource = ColumnDataSource(sourcesAndDemand)
 
@@ -150,6 +149,8 @@ fig.yaxis.axis_label = 'Total electricity Demand/Supply in Quarter (TWh)'
 fig.y_range.start=0
 fig.xaxis[0].ticker.desired_num_ticks = 10
 fig.yaxis.axis_label_text_font_style = "bold"
+fig.xaxis.axis_label_text_font_style = "bold"
+fig.xaxis.major_label_text_font_size = '12pt'
 
 
 lagoon, HPC = False,False

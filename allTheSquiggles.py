@@ -23,7 +23,6 @@ import colorcet as cc
 import seaborn as sns
 from numpy import linspace
 from scipy.stats.kde import gaussian_kde
-import panels
 import getData
 
 import datetime
@@ -40,13 +39,13 @@ data161 = getData.data161.copy()
 # Plot demand IN ONE DAY/WEEK/MONTH with Bokeh
 
 dataLength = 'week'
-if panels.output_folder != None:
-    output_file(panels.output_folder+"/AllTheSquiggles"+nowtime()+".html")
+#if panels.output_folder != None:
+#    output_file(panels.output_folder+"/AllTheSquiggles"+nowtime()+".html")
 fig = figure(plot_width=800, plot_height=500,
              title='UK electricity sources and demand, recorded at 5min intervals',
             x_axis_type='datetime', toolbar_location="above",
             tools='wheel_zoom,pan,box_zoom,reset',
-            active_scroll='wheel_zoom')
+            active_drag='box_zoom')
 fig.toolbar.logo=None
 pts = len(data161)
 
