@@ -16,6 +16,7 @@ from bokeh.models.widgets import Div
 from bokeh.util.hex import hexbin
 from bokeh.transform import linear_cmap
 import paras
+import writeLFdata
 ###########################################################################
 # Creates hex plot
 #######################################################################
@@ -32,37 +33,29 @@ def nowtime():
 # df gives the fraction of power that the source's capacity that it is 
 # currently generating at
 
-#df = pd.read_csv('LF4052019182.csv')
-df = pd.read_csv('LF5052019107.csv')
-df.drop('Unnamed: 0',inplace=True, axis=1)
+# If LF.csv is not in directory, make it and save it in directory
+try:
+    df = pd.read_csv('LF.csv')
+    df.drop('Unnamed: 0',inplace=True, axis=1)
+except:
+    print('File LF.csv not found. Creating file\nThis may take a few minutes')
+    df = writeLFdata.makecsv()
 
 #if panels.output_folder != None:
 #    output_file(panels.output_folder+"loadFollowingHex"+nowtime()+".html")
 
-#dataSource = ColumnDataSource(df)
-
-#dataSource = ColumnDataSource(df)
 zlist = ['Nuclear','Coal','Hydro','Wind','CCGT','Biomass','Pumped','French_ICT']
 ylist = [' '+z.lower()+str(2) for z in zlist]
-#ylist = [' nuclear2', ' coal2', ' hydro2', ' wind2',' ccgt2',
- #        ' biomass2',  ' pumped2', ' french_ict2']
-DSdict, figDict, lineDict = {},{},{}
+
+# Make grid of plots ########################
 figList = []
 for y,year in enumerate(df['Year'].unique()):
     print(year)
-#    DSname = 'DS'+str(year)
-#    DSdict[DSname] = ColumnDataSource(df[df['Year']==year])
     dfSubset = df[df['Year']==year]
     for i,source in enumerate(ylist):
         a = figure(title=zlist[i] + ' '+str(year), 
-                  # plot_height=120, 
-                  # plot_width=120,
-                   #match_aspect=True, 
                    background_fill_color='#440154',
                    toolbar_location=None)
-#        a.title.offset=0
-#        a.min_border=0
-#        a.sizing_mode='scale_both'
         a.grid.visible=False
         a.xaxis.major_tick_line_color = None 
         a.xaxis.minor_tick_line_color = None  
@@ -83,11 +76,11 @@ for y,year in enumerate(df['Year'].unique()):
             a.y_range.end=1
 
         if y == 0:
-            figList.append([a])#figDict[figname])
+            figList.append([a])
         else:
-            figList[i].append(a)#[figDict[figname]])
+            figList[i].append(a)
 
-# Make example plot - Copy of code above
+# Make example plot - Copy of code above #############################
 b = figure(title='Wind 2015', 
                    plot_height=220, 
                    plot_width=220,
@@ -106,8 +99,8 @@ b.xaxis.axis_label = 'Min         Demand         Max'
 b.yaxis.axis_label = 'Min        Wind          Max'
 b.xaxis.axis_label_text_font_style = "bold"
 b.yaxis.axis_label_text_font_style = "bold"
-b.xaxis.major_label_text_font_size = '0pt'  # turn off x-axis tick labels
-b.yaxis.major_label_text_font_size = '0pt'  # turn off y-axis tick labels
+b.xaxis.major_label_text_font_size = '0pt'  
+b.yaxis.major_label_text_font_size = '0pt'  
 dfSubset = df[df['Year']==2015]
 bins = hexbin(dfSubset[' demand2'],
               dfSubset[' wind2'],
@@ -115,8 +108,8 @@ bins = hexbin(dfSubset[' demand2'],
 b.hex_tile(q="q", r="r", size=0.01, line_color=None, source=bins[1:],
    fill_color=linear_cmap('counts', 'Viridis256', 
                           0, np.percentile(bins.counts,98)))
-#output_notebook()
 
+# Layout ###############################################################
 # Show example plot:
 #show(b)    
 space = Div(text="",width=100, height=100)

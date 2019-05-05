@@ -7,30 +7,23 @@ Created on Wed May  1 09:37:19 2019
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import re
-import plotly.plotly as py
-import plotly.graph_objs as go
-from ipywidgets import interact
-
-from bokeh.io import output_file, show, output_notebook, curdoc, push_notebook
-from bokeh.plotting import figure, output_file, show, output_notebook
+from bokeh.io import output_file, show, curdoc
+from bokeh.plotting import figure, output_file, show
 from bokeh.models import HoverTool, ColumnDataSource, Select,FixedTicker, PrintfTickFormatter, \
 Legend, DatetimeTickFormatter, CrosshairTool
 from bokeh.models.widgets import Select, Tabs, Panel, Slider, TextInput, DateRangeSlider, RangeSlider
 from bokeh.models.glyphs import VBar
 from bokeh.layouts import column, row
 from bokeh.palettes import Category10, Category20, Inferno
-import colorcet as cc
-import seaborn as sns
-from numpy import linspace
-from scipy.stats.kde import gaussian_kde
-
 import datetime
 #%load_ext blackcellmagic
 #%matplotlib inline
 
+# Take in wind data and generate tidal data ################################
+# Calculate electricity generation #########################################
+# Plot both on linked charts ###############################################
 
+# Range of dates that wind data is for
 startDate = datetime.datetime(2019,3,9)
 endDate = datetime.datetime(2019,4,10)
 tidaldf = pd.DataFrame({'DateTime':pd.date_range(start=startDate,
@@ -41,19 +34,13 @@ tidaldf = pd.DataFrame({'DateTime':pd.date_range(start=startDate,
 hrsIn1yr = 365*24
 annualOutputQuoted = 572e9 # GWh
 avgPowerQuoted = annualOutputQuoted/hrsIn1yr
-avgPowerQuoted
 avgPowerExpected = 36e6 # W
-offshoreLF = 0.39
-onshoreLF = 0.27
-offshoreWindCapNeeded = avgPowerExpected / offshoreLF
-offshoreWindCapNeeded/1e6
 no7MWturbinesNeeded = offshoreWindCapNeeded/7e6 # The three UK offshore wind projects in construction have 7MW turbines - renewableuk.com
-no7MWturbinesNeeded
 genHrsPerDay = 12
 powerWhenGenerating = avgPowerExpected*24/genHrsPerDay
 powerWhenGenerating/1e6
-
-tidaldf['Quantity (MW)'] = np.where((tidaldf.index%12) <(genHrsPerDay/2),
+# Set tidal lagoon to generate four times per day(24hrs) - in, out, in, out
+tidaldf['Quantity (MW)'] = np.where((tidaldf.index%6) <(genHrsPerDay/4),
                             powerWhenGenerating/1e6,0)
 
 
@@ -87,7 +74,6 @@ sherdf = pd.concat(sherDict)
 sherdf.reset_index(inplace=True)
 sherdf.drop('level_0', axis=1, inplace=True)
 sherdf.sort_values(by='DateTime',axis=0, inplace=True)
-#sherdf
 
 burbdf = pd.concat(burbDict)
 burbdf.reset_index(inplace=True)
@@ -124,10 +110,9 @@ condf.drop(['SP_x', 'Settlement Date_x', 'SP_y','Settlement Date_y', 'SP', 'Sett
 
 ########### PLOT ###############################################
 
-# Plot demand IN ONE WEEK with Bokeh
-nameList= ['Tidal','Dudgeon',"Sher'm Shoal",'BBE']   
+nameList= ['Tidal','Dudgeon',"Sher'm Shoal",'BBE']# To look nice
 
-ylist=['tidal','dudg','sher','burb']
+ylist=['tidal','dudg','sher','burb']# Column names
 #if panels.output_folder != None:
 #    output_file(panels.output_folder+nowtime()+".html")
 fig = figure(plot_width=600, plot_height=550,
@@ -149,17 +134,20 @@ global dataSource
 dataSource = ColumnDataSource(condf)
 
 def updateLineCDS(startDay=startDay, timeRange=timeRange):
+    '''When time window is updated, update the CDS for the line chart
+    so that the chart updates.
+    Called within both callback functions'''
     global start
     global end
     start = startDate + datetime.timedelta(days=startDay)
     end = start + datetime.timedelta(days=timeRange)
     dataSource.data.update(ColumnDataSource(
             data=makeDateSubset(condf, startDate=start, endDate=end)).data)
-
+    
 updateLineCDS()
 
+# Calculate energy and make up colorList so that both plots have same colours
 y,colorList= [],[]
-
 for colRef,bar in enumerate(ylist,1):
     y.append(calcEnergy(condf,bar))
     colorList.append(Category10[(len(ylist)+2)][colRef])
@@ -168,35 +156,33 @@ barDict = dict(x=nameList, top=y, col = colorList,
 
 barDS = ColumnDataSource((barDict))
 
-
+# Initial line plot 
 for colRef,line in enumerate(ylist,1):
     lines = fig.line(x='DateTime', y=line, source=dataSource, 
                  color = Category10[(len(ylist)+2)][colRef],
                 line_width=2) 
-
+# Initial bar plot
 bars = VBar(x='x', top='top',width=0.5,
             line_color='col',
            fill_color='col',
            name='names')
 barfig.add_glyph(barDS, bars)
 
+# Adjust line plot
 fig.outline_line_color = None
 fig.background_fill_color = "#efefef"
-
 fig.xaxis.formatter = DatetimeTickFormatter(days = [ '%a%e-%b'])
 fig.xaxis.minor_tick_line_color = 'black'
-
-#fig.axis.major_tick_line_color = None
 fig.axis.axis_line_color = 'black'
 fig.y_range.start=0
 barfig.y_range.start=0
-#nameDict =  {i:nameList[i] for i in list(range(4))}
-#barfig.xaxis.major_label_overrides = nameDict
-#fig.yaxis.axis_label = 'Total electricity supplied in Quarter (TWh)'
 
 numDays = (endDate-startDate).days
 
 def updateBarCDS(start,end):
+    '''When the time window is updated, update the CDS for the bar chart so 
+    that the bar chart updates.
+    Called within both callback functions'''
     y=[]
     for bar in nameList:
         y.append(calcEnergy(makeDateSubset(condf, startDate=start, endDate=end),bar))
@@ -204,10 +190,11 @@ def updateBarCDS(start,end):
     barDS.data.update(ColumnDataSource(data=barDict).data)
 
 
-
+# Set up widgets - two sliders to adjust the time window
 startDaySlider = Slider(start=1, end=numDays-7, value=timeRange,
      step=1, title='Start day')
 def startDayCallback(attr, old, new):
+    '''Slider to set the first day of the time window shown'''
     global startDay 
     startDay = startDaySlider.value
     updateLineCDS(startDay=startDay, timeRange=timeRange)
@@ -217,6 +204,8 @@ startDaySlider.on_change('value', startDayCallback)
 dateRangeSlider = Slider(start=7, end=numDays, value=startDay,
      step=1, title='Time window')
 def dateRangeCallback(attr, old, new):
+    '''Slider to set the time range shown i.e. the width of the 
+    time window'''
     global timeRange
     timeRange = dateRangeSlider.value
     updateLineCDS(startDay=startDay, timeRange=timeRange)

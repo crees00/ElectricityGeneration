@@ -7,35 +7,24 @@ Created on Wed May  1 12:46:49 2019
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from bokeh.io import output_file, show, output_notebook, curdoc
-from bokeh.plotting import figure, output_file, show, output_notebook
+from bokeh.io import output_file, show, curdoc
+from bokeh.plotting import figure, output_file, show
 from bokeh.models import HoverTool, ColumnDataSource, Select,FixedTicker, PrintfTickFormatter, Legend, CrosshairTool
-from bokeh.models.widgets import Select
 from bokeh.models import CheckboxGroup, RadioGroup, Toggle, CheckboxButtonGroup, Button
 from bokeh.layouts import column, row
 from bokeh.palettes import Category10, Category20, Inferno
-import colorcet as cc
-import seaborn as sns
-from numpy import linspace
-from scipy.stats.kde import gaussian_kde
-
 import datetime
 
 # Read in data to get supply values from different electricity sources ############
 data4 = pd.read_csv('5.1SuppliedQuarterly.csv', index_col=0, parse_dates=True, skiprows=4, header=[0,1])
 data4.drop('Year',1, level=0,inplace=True)
 data4.dropna(axis=1, thresh=1, inplace=True)
-
 data5 = data4.transpose()
 data5.index.set_names(['Year','Quarter'])
-
 data51 = data5.reset_index()
-data51
 data51['Year'] = data51.apply(lambda row: int(row['level_0']), axis=1)
 data51['Quarter'] = data51.apply(lambda row: int(str(row['level_1'])[0]), axis=1)
 data51['Date'] = data51.apply(lambda row: datetime.datetime(row['Year'],(3*(row['Quarter'])-2),1), axis=1)
-
 data52 = data51.drop('- of which, Offshore',axis=1)
 otherCols = ['Oil','Hydro (natural flow) ','Bioenergy',
              'Pumped storage (net supply)', 'Other fuels','Net imports']
@@ -66,7 +55,6 @@ HPCpower = 3.26e9 * 0.9 # W assuming 90% capacity factor
 secsInQuarter = 60*60*24*365.25/4
 HPCjoulesInQuarter = HPCpower * secsInQuarter 
 HPCTWhInQuarter = HPCjoulesInQuarter / (3600*1e12)
-print(HPCTWhInQuarter)
 sourcesAndDemand['Nuclear with HPC'] = sourcesAndDemand['Nuclear'] + HPCTWhInQuarter
 
 # Calculate output from tidal lagoon #########################################
@@ -79,8 +67,7 @@ sourcesAndDemand['All other - including lagoon'] = sourcesAndDemand['All other']
 ylist = list(set(sourcesAndDemand.columns)-set(['level_0', 'level_1', 
        'Year', 'Quarter', 'Date'])-set(otherCols))
 #zlist = [item[1:].lower() for item in ylist]
-
-showcols = ['Demand','Nuclear','Wind and Solar']
+showcols = ['Demand','Nuclear','Wind and Solar'] # Initial columns
 
 
 def nowtime():
@@ -121,29 +108,12 @@ for colRef,line in enumerate(ylist,1):
                                  renderers=[lines], toggleable=False, 
                                  mode='vline')
     fig.add_tools(hover)
-    #tips2 = 
-    #hover2 = HoverTool(tooltips =tips2, 
-     #                     formatters={' timestamp': 'datetime'},
-    #                      renderers=[lines], toggleable=False,
-    #                     mode='vline')
-    #    fig.add_tools(hover2)
-#    if line in showcols:
-#        dictOfLines[line].visible = True
-#    else:
-#        dictOfLines[line].visible = False
 showLines()        
     
-#legend = Legend(items=legend, location='center')
-#fig.add_layout(legend, 'right')
-#fig.legend.click_policy="hide"
 fig.add_tools(CrosshairTool(dimensions='height'))  
-
 fig.outline_line_color = None
 fig.background_fill_color = "#efefef"
-
 fig.xaxis.minor_tick_line_color = 'black'
-
-#fig.axis.major_tick_line_color = None
 fig.axis.axis_line_color = 'black'
 fig.yaxis.axis_label = 'Total electricity Demand/Supply in Quarter (TWh)'
 fig.y_range.start=0
@@ -153,12 +123,15 @@ fig.xaxis.axis_label_text_font_style = "bold"
 fig.xaxis.major_label_text_font_size = '12pt'
 
 
+# Make widgets to make plots interactive ##################################
+
 lagoon, HPC = False,False
 ylistb = list(set(ylist)-set(['Nuclear with HPC','All other - including lagoon']))
 showrefs = [ylistb.index(item) for item in showcols]
 checkbuttons = CheckboxButtonGroup(labels=ylistb, active=showrefs,
                                    button_type = 'default')
 def checkboxCallback(active):
+    '''Changes visibility of lines based on button selection'''
     global showcols
     showcols=[]
     print(active)
@@ -175,14 +148,12 @@ def checkboxCallback(active):
         except: None
     elif lagoon and ('All other - including lagoon' not in showcols):
         showcols.append('All other - including lagoon')
-    
     showLines(showcols)
-
 checkbuttons.on_click(checkboxCallback)
-
 
 HPCButton = Toggle(label='Add Hinkley Point C', button_type = 'default')
 def addHPC(clicked):
+    '''Changes visibility of nuclear/ nuc+HPC lines based on one button'''
     global HPC
     HPC = clicked
     if HPC and ('Nuclear' not in showcols):
@@ -199,6 +170,7 @@ HPCButton.on_click(addHPC)
 
 lagoonButton = Toggle(label = 'Add tidal lagoon', button_type = 'default')
 def addLagoon(clicked):
+    '''Changes visibility of other/ other+lagoon lines based on one button'''
     global lagoon
     lagoon = clicked
     if clicked:
@@ -215,6 +187,7 @@ lagoonButton.on_click(addLagoon)
     
 axisButton = Button(label='Update y-axis', button_type = 'primary')
 def updateAxis():
+    '''Button to update y axis range for current visible lines'''
     newMax=0
     for colname in showcols:
         print(colname)
