@@ -37,16 +37,16 @@ Our electricity comes from a lot of different places. The key ones are shown in 
 
 <b>Units - what's a GW?</b>
 <br><br>
-The rate of generation/consumption of electrical energy is called power, measured in Watts (W). 
+The rate of generation/consumption of electrical energy is called power, measured in Watts (W) - amount of electrical energy per second. 
 <br>
 <br> 1kW = 1,000W
 <br> 1MW = 1,000,000W
 <br> 1GW = 1,000,000,000W
 <br> 1TW = 1,000,000,000,000W.
 <br><br>
-The quantity of electrical energy generated/consumed is measured in [kilo/mega/giga/tera]Watt-Hours (Wh). For example, you can generate 10MWh by generating at a power of 1MW for 10hours, or 10MW for 1hour. 
+The quantity of electrical energy generated/consumed is measured in [kilo/mega/giga/tera]Watt-Hours (Wh). For example, you can generate 10MWh of electrical energy by generating at a power of 1MW for 10hours, or 10MW for 1hour. 
 <br><br>
-This is like saying how far you travel when moving at different speeds - you could travel 20 miles by walking for 20mins then cycling for an hour, or you could take a helicopter and cover the same distance in a few minutes.   
+Your electricity provider probably charges you per kWh (a 'unit' of electricity). All that matters is how many kWh of electricity you have used in the last month. It doesn't matter if you've used your 2kW kettle for 5 minutes to make some tea or left your 55" LG OLED TV on standby at 0.5W for a fortnight, you've used the same amount of electricity so you'll get the same bill. 
 <br><br><br>
 
 <b>Data Sources</b>
