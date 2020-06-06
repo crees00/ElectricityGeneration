@@ -159,12 +159,12 @@ Compare that to coal in 2012 - Here there is a clear link between coal generatio
 """
 
 introP = Div(text=para0, width=600, height=600)
-squiggleP = Div(text=para1,width=400, height=180)
-ridgeP = Div(text=para2, width=600, height=220)
-govtP = Div(text=para3, width=600, height=200)
+squiggleP = Div(text=para1,width=400, height=240)
+ridgeP = Div(text=para2, width=600, height=260)
+govtP = Div(text=para3, width=600, height=300)
 govtPb = Div(text=para3b, width=400, height=300)
 govtPc = Div(text=para3c, width=400, height=300)
 gap = Div(text="", width=50, height=300)
-tidalvwindP = Div(text=para4, width=600, height=380)
+tidalvwindP = Div(text=para4, width=600, height=420)
 LFP = Div(text=para5, width=600, height=380)
 #show(p)

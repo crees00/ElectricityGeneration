@@ -43,8 +43,12 @@ def ridge(category, data, scale=800):
 
 # Prepare for ridge plot
 years = data122['Year'].unique()
-palette1 =[cc.coolwarm[i*10+160] for i in range(len(years)+1)]
-palette2 =[cc.coolwarm[100-i*10] for i in range(len(years)+1)]
+print(len(cc.coolwarm))
+print(len(years))
+lim1 = int(255-(len(years)*10))
+lim2 = int(10*len(years))
+palette1 =[cc.coolwarm[i*10+lim1] for i in range(len(years)+1)]
+palette2 =[cc.coolwarm[lim2-i*10] for i in range(len(years)+1)]
 xmin,xmax,num = 0,max(data122[[' nuclear',' wind']].max()),500
 x = linspace(xmin,xmax,num)
 xnew = list(x)
