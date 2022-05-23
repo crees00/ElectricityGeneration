@@ -94,9 +94,10 @@ b.grid.visible=False
 b.xaxis.major_tick_line_color = None 
 b.xaxis.minor_tick_line_color = None  
 b.yaxis.major_tick_line_color = None 
-b.yaxis.minor_tick_line_color = None 
-b.xaxis.axis_label = 'Min         Demand         Max'
-b.yaxis.axis_label = 'Min        Wind          Max'
+b.yaxis.minor_tick_line_color = None
+spaces = 75
+b.xaxis.axis_label = f'Min{spaces * " "}Demand{spaces * " "}Max'
+b.yaxis.axis_label = f'Min{spaces * " "}Wind{spaces * " "}Max'
 b.xaxis.axis_label_text_font_style = "bold"
 b.yaxis.axis_label_text_font_style = "bold"
 b.xaxis.major_label_text_font_size = '0pt'  
@@ -117,6 +118,6 @@ grid1 = gridplot(children=figList,
                            toolbar_location=None,
                            plot_width=120,
                            plot_height=120)
-layout = layout([[paras.LFP,space,b],
+layout = layout([[paras.LFP, space, b],
                 [grid1]])
 #show(layout)
